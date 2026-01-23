@@ -462,4 +462,28 @@ public class TestMusicKeyUtils {
 
 	}
 
+	// mswe261p 2026-01-23: partition-based cases for midi range boundaries
+	@Test
+	public void testNoteNameMidiRangeBoundaries() {
+		assertEquals("C0", TGMusicKeyUtils.sharpNoteFullName(TGMusicKeyUtils.MIN_MIDI_NOTE));
+		assertEquals("G9", TGMusicKeyUtils.sharpNoteFullName(TGMusicKeyUtils.MAX_MIDI_NOTE));
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for invalid midi range
+	@Test
+	public void testNoteNameInvalidMidiRangeReturnsNull() {
+		assertNull(TGMusicKeyUtils.noteName(0, 0));
+		assertNull(TGMusicKeyUtils.noteName(200, 0));
+		assertNull(TGMusicKeyUtils.sharpNoteFullName(0));
+		assertNull(TGMusicKeyUtils.sharpNoteFullName(200));
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for invalid key signatures
+	@Test
+	public void testNoteNameInvalidKeySignatureReturnsNull() {
+		assertNull(TGMusicKeyUtils.noteName(69, -1));
+		assertNull(TGMusicKeyUtils.noteName(69, 15));
+		assertNull(TGMusicKeyUtils.noteFullName(69, -1));
+		assertNull(TGMusicKeyUtils.noteFullName(69, 15));
+	}
 }
