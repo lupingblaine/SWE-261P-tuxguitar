@@ -299,4 +299,66 @@ public class TestTGDuration {
 		catch (Throwable e) {}
 		assert(ok);
 	}
+
+	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
+	@Test
+	public void testSplitDurationValidSimple() {
+		List<TGDuration> list = TGDuration.splitPreciseDuration(TGDuration.WHOLE_PRECISE_DURATION / 2,
+				TGDuration.WHOLE_PRECISE_DURATION / 8, factory);
+		assertNotNull(list);
+		assertEquals(4, list.size());
+		for (int i = 0; i < list.size(); i++) {
+			assertEquals(TGDuration.WHOLE_PRECISE_DURATION / 8, list.get(i).getPreciseTime());
+		}
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
+	@Test
+	public void testSplitDurationFineSubdivision() {
+		List<TGDuration> list = TGDuration.splitPreciseDuration(TGDuration.WHOLE_PRECISE_DURATION * 3 / 64,
+				TGDuration.WHOLE_PRECISE_DURATION, factory);
+		assertNotNull(list);
+		long sum = 0;
+		for (int i = 0; i < list.size(); i++) {
+			sum += list.get(i).getPreciseTime();
+		}
+		assertEquals(TGDuration.WHOLE_PRECISE_DURATION * 3 / 64, sum);
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
+	@Test
+	public void testSplitDurationImpossibleReturnsNull() {
+		List<TGDuration> list = TGDuration.splitPreciseDuration(TGDuration.WHOLE_PRECISE_DURATION / 19,
+				TGDuration.WHOLE_PRECISE_DURATION, factory);
+		assertNull(list);
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
+	@Test
+	public void testSplitDurationMaxBoundary() {
+		long max = TGDuration.WHOLE_PRECISE_DURATION * 3 / 8;
+		List<TGDuration> list = TGDuration.splitPreciseDuration(TGDuration.WHOLE_PRECISE_DURATION, max, factory);
+		assertNotNull(list);
+		long sum = 0;
+		for (int i = 0; i < list.size(); i++) {
+			long preciseTime = list.get(i).getPreciseTime();
+			assertTrue(preciseTime <= max, "KO, max " + String.valueOf(max) + " / " + String.valueOf(preciseTime));
+			sum += preciseTime;
+		}
+		assertEquals(TGDuration.WHOLE_PRECISE_DURATION, sum);
+	}
+
+	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
+	@Test
+	public void testSplitDurationLargeTotalNoCrash() {
+		boolean ok = false;
+		try {
+			TGDuration.splitPreciseDuration(5 * TGDuration.WHOLE_PRECISE_DURATION,
+					2 * TGDuration.WHOLE_PRECISE_DURATION, factory);
+			ok = true;
+		} catch (Throwable e) {
+			// ignore, checked via ok flag
+		}
+		assertTrue(ok);
+	}
 }
