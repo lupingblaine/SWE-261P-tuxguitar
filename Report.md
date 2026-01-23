@@ -52,27 +52,28 @@ The following steps outline the procedure for building the project on a macOS en
 
 ## 3. Study of Existing Testing Practices
 
-### 3.1 Testing Frameworks and Architecture
-TuxGuitar utilizes **JUnit 5 (junit-jupiter-engine)** as its primary testing engine. The testing infrastructure is organized following the standard Maven project structure, where test sources are decoupled from main application logic. The most critical logic tests are housed within the `common/` directory, which contains the platform-independent music theory and file format modules.
+### 3.1 Testing Frameworks and Implementation
+TuxGuitar utilizes **JUnit 5 (junit-jupiter-engine)** as its primary testing framework. The testing architecture follows a modular approach, where test suites are decentralized into individual component directories to ensure isolated verification of logic.
 
 ### 3.2 Key Testing Modules and File Locations
-The following core modules contain the most significant testing assets, which we analyzed to understand the system's quality assurance practices:
+Based on our repository analysis, the existing test cases are primarily concentrated in the following core logic modules:
+* **TuxGuitar-lib (`common/TuxGuitar-lib/src/test/java`)**: Houses critical music model tests, such as `TestTGDuration` and `TestTrackManager`.
+* **Testing Resources**: The module utilizes dedicated resource files for file format verification, including `test_20.xml` and `test_midi_20.tg`.
 
-* **TuxGuitar-lib (`common/TuxGuitar-lib/src/test/java`)**:
-    Contains tests for core musical entities. A key example is `org.herac.tuxguitar.io.base.TGRawExporterTestCase`, which validates the fundamental data export logic.
-* **TuxGuitar-compat (`common/TuxGuitar-compat/src/test/java`)**:
-    Focuses on backward compatibility and cross-module integration.
-* **TuxGuitar-midi (`common/TuxGuitar-midi/src/test/java`)**:
-    Ensures the integrity of MIDI event generation and parsing.
+### 3.3 Build Verification and Troubleshooting
+During the initial execution of the test suite via Maven, we encountered a build hurdle that required technical intervention.
 
-### 3.3 Test Resource Management
-Unlike many simpler projects, TuxGuitar manages a specialized set of binary and XML music files for regression testing. These are located in:
-* `common/TuxGuitar-lib/src/test/resources/`
-Notable test inputs include:
-* `test_20.xml`: A standardized XML representation of a score for structural validation.
-* `test_midi_20.tg`: A native TuxGuitar format file used to verify MIDI engine consistency.
+#### **Technical Challenge: Path Encoding Conflict**
+When running `mvn test` within the `TuxGuitar-lib` module, the build initially failed with multiple `java.io.FileNotFoundException` errors.
+* **Symptom**: The Maven Surefire plugin reported that it could not locate standardized music resource files (e.g., `Untitled_20.xml`).
+* **Root Cause Analysis**: The local directory path contained special characters and spaces (`&`, `:`, and `%20`), which prevented the Java `FileInputStream` from correctly resolving absolute paths to the `target/test-classes/` directory.
+* **Resolution**: We performed a "clean relocation" by moving the project to a standardized alphanumeric directory path. We then executed `mvn clean test` to purge corrupted build artifacts and re-index the resource metadata.
 
-### 3.4 Test Execution and Reporting
-The project leverages the **Maven Surefire Plugin** to automate test execution. To run the suite for the core library and generate a coverage-ready report, we use the following scoped command:
-```bash
-mvn test -pl common/TuxGuitar-lib
+#### **Successful Test Execution**
+After resolving the environment-specific pathing issues, we successfully executed the full test suite for the core library.
+
+![TuxGuitar-lib Test Success Summary](testallresult.jpg)
+
+As shown in the execution log above, the system verified **64 test cases** with zero failures or errors, confirming the integrity of the core music engine, file I/O operations, and duration management logic.
+
+---
