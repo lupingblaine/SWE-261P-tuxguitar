@@ -36,7 +36,7 @@ The following steps outline the procedure for building the project on a macOS en
 2.  **SWT Configuration:** Download the platform-specific SWT zip and install the `.jar` into the local Maven repository:
     ```bash
     TUX_ARCH=`uname -m | sed 's/arm64/aarch64/'`
-    wget [https://download.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/swt-4.37-cocoa-macosx-$](https://download.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/swt-4.37-cocoa-macosx-$){TUX_ARCH}.zip
+    wget https://download.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/swt-4.37-cocoa-macosx-${TUX_ARCH}.zip
     unzip swt-4.37-cocoa-macosx-${TUX_ARCH}.zip
     mvn install:install-file -Dfile=swt.jar -DgroupId=org.eclipse.swt -DartifactId=org.eclipse.swt.cocoa.macosx -Dpackaging=jar -Dversion=4.37
     ```
@@ -77,3 +77,80 @@ After resolving the environment-specific pathing issues, we successfully execute
 As shown in the execution log above, the system verified **64 test cases** with zero failures or errors, confirming the integrity of the core music engine, file I/O operations, and duration management logic.
 
 ---
+
+## 4. Partitioning
+
+### 4.1 Motivation and Concepts (Systematic Functional Testing & Partition Testing)
+Because the input space of a real software system is vast, exhaustive testing is not feasible. **Systematic functional testing** addresses this by selecting representative inputs that reflect how the system should behave according to its specification. **Partition testing** divides the input space into subsets (partitions) that are expected to behave similarly; we then test one or more representative values from each partition, with extra attention to **boundary values** where failures are more likely. This provides high defect detection efficiency with a manageable number of test cases.
+
+### 4.2 Xiyao LI: TGDuration (TestTGDuration.java)
+**Feature chosen:** `TGDuration.splitPreciseDuration(total, max, factory)`  
+This method is suitable for partitioning because the outcome depends on the relationship between the total duration and the maximum allowed duration, and whether the total can be expressed using valid note divisions (including dotted values).
+
+**Partitioning scheme and partitions:**
+- **P1 Valid, simple exact split:** Total duration can be evenly decomposed into identical pieces within the `max` limit.  
+- **P2 Valid, fine subdivision required (boundary):** Total duration can be decomposed only using finer rhythmic divisions (e.g., dotted values).  
+- **P3 Invalid / impossible to split:** Total duration cannot be expressed using allowed note values.  
+- **P4 Valid with non‑power‑of‑two max (boundary):** `max` is a non‑power‑of‑two constraint; all pieces must be ≤ `max`.  
+- **P5 Large input robustness:** Very large total duration to ensure no overflow or runtime failure.
+
+**How partitions differ:**  
+P1 is a straightforward exact split; P2 is valid but requires finer subdivisions; P3 is invalid and should return `null`; P4 stresses boundary behavior on `max`; P5 stresses robustness under large values.
+
+**Relationship to existing tests:**  
+The original `TestTGDuration` already covers core conversions, precise-time mapping, and several historical split cases. The five new tests are **additive**, and are designed specifically to exercise partition boundaries and invalid/robustness scenarios without modifying or replacing the original test logic.
+
+**Representative values (one per partition):**
+- **P1 - testSplitDurationValidSimple():** `total = WHOLE_PRECISE_DURATION / 2`, `max = WHOLE_PRECISE_DURATION / 8`  
+- **P2 - testSplitDurationFineSubdivision():** `total = WHOLE_PRECISE_DURATION * 3 / 64`, `max = WHOLE_PRECISE_DURATION`  
+- **P3 - testSplitDurationImpossibleReturnsNull():** `total = WHOLE_PRECISE_DURATION / 19`, `max = WHOLE_PRECISE_DURATION`  
+- **P4 - testSplitDurationMaxBoundary():** `total = WHOLE_PRECISE_DURATION`, `max = WHOLE_PRECISE_DURATION * 3 / 8`  
+- **P5 - testSplitDurationLargeTotalNoCrash():** `total = 5 * WHOLE_PRECISE_DURATION`, `max = 2 * WHOLE_PRECISE_DURATION`
+
+**How representative values were chosen:**  
+We selected values that map directly to each partition’s behavior, with explicit **boundary cases** (non‑power‑of‑two max and fine subdivisions) and an **invalid case** (non‑representable total).
+
+**JUnit tests added:**  
+`testSplitDurationValidSimple`, `testSplitDurationFineSubdivision`, `testSplitDurationImpossibleReturnsNull`, `testSplitDurationMaxBoundary`, `testSplitDurationLargeTotalNoCrash`
+
+**How to run (command):**
+```bash
+cd /YourPathTo/SWE-261P-tuxguitar
+./mvnw -f common/TuxGuitar-lib/pom.xml -Dtest=TestTGDuration test
+```
+
+![Xiyao TGDuration Test Result](week1_xiyao_test.png)
+
+### 4.3 Ping Lu: Music Key Utilities (TestMusicKeyUtils.java)
+**Feature chosen:** `TGMusicKeyUtils.noteName / noteFullName / sharpNoteFullName`  
+This feature is suitable for partitioning because the output depends on **MIDI note range** and **key signature validity**, which define clear validity boundaries.
+
+**Partitioning scheme and partitions:**
+- **Q1 Valid MIDI range (boundary):** MIDI notes at the minimum and maximum valid values.  
+- **Q2 Invalid MIDI range:** MIDI notes below minimum or above maximum should return `null`.  
+- **Q3 Invalid key signature:** Key signature outside the valid range should return `null`.
+
+**How partitions differ:**  
+Q1 validates correct boundary behavior within the accepted range; Q2 validates input rejection for out‑of‑range notes; Q3 validates rejection for invalid key signatures.
+
+**Relationship to existing tests:**  
+The original `TestMusicKeyUtils` already verifies many note‑naming and accidental cases. The new tests are **additive**, focusing specifically on boundary and invalid‑input partitions (MIDI range and keySignature validity) without replacing existing coverage.
+
+**Representative values (one per partition):**
+- **Q1 - testNoteNameMidiRangeBoundaries():** `MIN_MIDI_NOTE = 12`, `MAX_MIDI_NOTE = 127`  
+- **Q2 - testNoteNameInvalidMidiRangeReturnsNull():** `midiNote = 0`, `midiNote = 200`  
+- **Q3 - testNoteNameInvalidKeySignatureReturnsNull():** `keySignature = -1`, `keySignature = 15`
+
+**How representative values were chosen:**  
+We used explicit boundary values for valid input and clearly invalid values to verify rejection logic.
+
+**JUnit tests added:**  
+`testNoteNameMidiRangeBoundaries`, `testNoteNameInvalidMidiRangeReturnsNull`, `testNoteNameInvalidKeySignatureReturnsNull`
+
+**How to run (command):**
+```bash
+cd /YourPathTo/SWE-261P-tuxguitar
+./mvnw -f common/TuxGuitar-lib/pom.xml -Dtest=TestMusicKeyUtils test
+```
+
+![Ping MusicKeyUtils Test Result](week1_ping_test.jpg)
