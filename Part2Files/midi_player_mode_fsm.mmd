@@ -1,0 +1,13 @@
+stateDiagram-v2
+    [*] --> SimpleMode
+
+    state "SimpleMode Invariant: currentPercent == simplePercent" as SimpleMode
+    state "CustomMode Invariant: customFrom <= currentPercent <= customTo" as CustomMode
+
+    SimpleMode --> SimpleMode: When reset() or notifyLoop(), then currentPercent = simplePercent
+
+    SimpleMode --> CustomMode: setType(Custom) + reset()
+    CustomMode --> SimpleMode: setType(Simple) + reset()
+
+    CustomMode --> CustomMode: When reset(), then currentPercent = customFrom
+    CustomMode --> CustomMode: When notifyLoop(), then currentPercent = min(customTo, currentPercent + increment)

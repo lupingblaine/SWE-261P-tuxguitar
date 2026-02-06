@@ -1,0 +1,18 @@
+stateDiagram-v2
+    [*] --> Empty
+
+    state "Empty: empty == true notes.size == 0" as Empty
+    state "Active: empty == false notes.size > 0" as Active
+    state "Inconsistent: empty == false notes.size == 0" as Inconsistent
+
+    Empty --> Active: addNote()
+    Empty --> Inconsistent: setEmpty(false)
+
+    Active --> Inconsistent: removeNote(last)
+    Active --> Empty: setEmpty(true)
+
+    Inconsistent --> Active: addNote()
+    Inconsistent --> Empty: setEmpty(true)
+
+
+site:https://www.processon.com/mermaid

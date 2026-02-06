@@ -83,7 +83,7 @@ As shown in the execution log above, the system verified **64 test cases** with 
 ### 4.1 Motivation and Concepts (Systematic Functional Testing & Partition Testing)
 Because the input space of a real software system is vast, exhaustive testing is not feasible. **Systematic functional testing** addresses this by selecting representative inputs that reflect how the system should behave according to its specification. **Partition testing** divides the input space into subsets (partitions) that are expected to behave similarly; we then test one or more representative values from each partition, with extra attention to **boundary values** where failures are more likely. This provides high defect detection efficiency with a manageable number of test cases.
 
-### 4.2 Xiyao LI: TGDuration (TestTGDuration.java)
+### 4.2.1: TGDuration (TestTGDuration.java)
 **Feature chosen:** `TGDuration.splitPreciseDuration(total, max, factory)`  
 This method is suitable for partitioning because the outcome depends on the relationship between the total duration and the maximum allowed duration, and whether the total can be expressed using valid note divisions (including dotted values).
 
@@ -121,7 +121,7 @@ cd /YourPathTo/SWE-261P-tuxguitar
 
 ![Xiyao TGDuration Test Result](week1_xiyao_test.png)
 
-### 4.3 Ping Lu: Music Key Utilities (TestMusicKeyUtils.java)
+### 4.2.2: Music Key Utilities (TestMusicKeyUtils.java)
 **Feature chosen:** `TGMusicKeyUtils.noteName / noteFullName / sharpNoteFullName`  
 This feature is suitable for partitioning because the output depends on **MIDI note range** and **key signature validity**, which define clear validity boundaries.
 
@@ -154,3 +154,68 @@ cd /YourPathTo/SWE-261P-tuxguitar
 ```
 
 ![Ping MusicKeyUtils Test Result](week1_ping_test.jpg)
+
+---
+
+## 5. Functional Models (Finite State Machines)
+
+### 5.1 Why Finite Models Are Useful for Testing
+Finite models (especially finite state machines) make behavior **explicit and enumerable**. By listing states and transitions, we can:
+* Systematically cover **all valid transitions** and **self-loops**.
+* Expose **illegal or missing transitions** (e.g., surprising states reachable by certain operations).
+* Validate **sequences of operations**, not just single input/output pairs.
+This yields higher confidence with a bounded set of tests.
+
+### 5.2.1: `MidiPlayerMode` (Tempo Mode Progression)
+**Feature chosen:** `app.tuxguitar.player.base.MidiPlayerMode`  
+This component governs how playback tempo is computed across loops. Its behavior depends on the **mode** (`TYPE_SIMPLE` vs `TYPE_CUSTOM`) and the **currentPercent** value, making it well-suited to a finite state model.
+
+**Finite state model (FSM):**
+States are defined by `type` plus the invariant for `currentPercent`.
+![MidiPlayerMode FSM](/Users/shaw/IdeaProjects/SWE-261P-tuxguitar/Part2Files/midi_player_mode_fsm.png)
+
+**How the model works:**  
+`reset()` initializes `currentPercent` according to the mode.  
+`notifyLoop()` is the loop-transition: in `SimpleMode` it remains constant, while in `CustomMode` it increments and caps at `customTo`.
+
+**JUnit tests added (covering all transitions and self-loops):**
+* `testDefaultSimpleResetSetsCurrentPercent`
+* `testCustomResetStartsFromCustomFrom`
+* `testCustomNotifyLoopIncrementsAndCaps`
+* `testSimpleNotifyLoopResetsToSimplePercent`
+
+**Test file:**  
+`common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiPlayerMode.java`
+
+**How to run:**
+```bash
+cd /YourPathTo/SWE-261P-tuxguitar
+./mvnw -f common/TuxGuitar-lib/pom.xml -Dtest=TestMidiPlayerMode test
+```
+
+### 5.2.2: `TGVoice` (Voice Content State)
+**Feature chosen:** `app.tuxguitar.song.models.TGVoice`  
+`TGVoice` tracks musical content using two observable aspects: an `empty` flag and the `notes` list. The interactions between `addNote`, `removeNote`, and `setEmpty` create a **finite set of reachable states**, including an interesting “inconsistent” state that is reachable by design.
+
+**Finite state model (FSM):**
+![TGVoice FSM](/Users/shaw/IdeaProjects/SWE-261P-tuxguitar/Part2Files/tg_voice_fsm.png)
+
+**How the model works:**  
+`addNote()` always sets `empty=false` and adds to the list.  
+`removeNote()` does **not** flip `empty` back to `true`, so removing the last note creates state `[V2]`.  
+`setEmpty(true)` clears the list and returns to `[V0]`.
+
+**JUnit tests added (covering all states and transitions):**
+* `testAddNoteTransitionsToActive`
+* `testRemoveLastNoteLeavesInconsistentState`
+* `testSetEmptyTrueClearsNotesAndSetsEmpty`
+* `testSetEmptyFalseFromEmptyCreatesInconsistentState`
+
+**Test file:**  
+`common/TuxGuitar-lib/src/test/java/app/tuxguitar/song/models/TestTGVoiceStateMachine.java`
+
+**How to run:**
+```bash
+cd /YourPathTo/SWE-261P-tuxguitar
+./mvnw -f common/TuxGuitar-lib/pom.xml -Dtest=TestTGVoiceStateMachine test
+```
