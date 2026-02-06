@@ -157,7 +157,7 @@ cd /YourPathTo/SWE-261P-tuxguitar
 
 ---
 
-## 5. Functional Models (Finite State Machines)
+## 5. Functional Models (Finite State Machines) - Part 2. Functional Testing and Finite State Machines.
 
 ### 5.1 Why Finite Models Are Useful for Testing
 Finite models (especially finite state machines) make behavior **explicit and enumerable**. By listing states and transitions, we can:
