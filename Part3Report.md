@@ -47,7 +47,7 @@ These packages include rendering/painter logic, printing-related code, and helpe
 
 ### 1.4 New Test Cases
 
-**New test added:**  [Click]()
+**New test added:**  [Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/util/base64/TestBase64Codec.java)
 `common/TuxGuitar-lib/src/test/java/app/tuxguitar/util/base64/TestBase64Codec.java`
 
 **Targeted production code:**  
