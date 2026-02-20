@@ -1,0 +1,22 @@
+name: Part4 CI Build and Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build and test common/TuxGuitar-lib
+        run: ./mvnw -f common/TuxGuitar-lib/pom.xml -e clean verify
