@@ -1,4 +1,11 @@
 # Part 5 Report: Testable Design, Stubbing, Bad Testable Design, and Mocking
+**Project:** TuxGuitar (Open Source Tablature Editor)  
+**Course:** SWE 261P  
+**Member:** Xiyao Li & Ping Lu  
+**Date:** February 20, 2026  
+
+**Base repository link:** https://github.com/helge17/tuxguitar  
+**Forked repository link:** https://github.com/lupingblaine/SWE-261P-tuxguitar  
 
 ## 1. Testable Design: aspects and goals
 
@@ -18,7 +25,7 @@ Key aspects and goals:
 
 Existing example:
 
-- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestLetRing.java`
+- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestLetRing.java`[Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestLetRing.java)
 
 How stubbing is used:
 
@@ -35,7 +42,7 @@ Why this is used:
 
 Implemented file:
 
-- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/thread/TestTGThreadManagerStubbing.java`
+- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/thread/TestTGThreadManagerStubbing.java`[Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/thread/TestTGThreadManagerStubbing.java)
 
 What was done:
 
@@ -109,7 +116,7 @@ New functionality added:
 
 Implemented file:
 
-- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyTestability.java`
+- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyTestability.java` [Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyTestability.java)
 
 Test behavior:
 
@@ -149,7 +156,7 @@ Why mocking helps:
 
 Implemented test:
 
-- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyMocking.java`
+- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyMocking.java`[Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiSynthesizerProxyMocking.java)
 
 Run test:
 
@@ -170,7 +177,7 @@ Why mocking helps:
 
 Implemented test:
 
-- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiTransmitterMocking.java`
+- `common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiTransmitterMocking.java`[Click](https://github.com/lupingblaine/SWE-261P-tuxguitar/blob/master/common/TuxGuitar-lib/src/test/java/app/tuxguitar/player/base/TestMidiTransmitterMocking.java)
 
 Run test:
 
