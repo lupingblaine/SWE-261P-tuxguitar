@@ -59,5 +59,12 @@
 			<version>5.9.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<!-- part5：为基于 Mock 的测试用例添加 Mockito 测试依赖 -->
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>4.11.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
