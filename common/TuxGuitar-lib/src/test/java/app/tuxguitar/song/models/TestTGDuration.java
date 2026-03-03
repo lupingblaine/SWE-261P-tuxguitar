@@ -310,7 +310,7 @@ public class TestTGDuration {
 		for (int i = 0; i < list.size(); i++) {
 			assertEquals(TGDuration.WHOLE_PRECISE_DURATION / 8, list.get(i).getPreciseTime());
 		}
-	}
+	} //在最典型、最“规则”的 partition 下，函数能把总时长均匀拆成相同块，而且严格满足 max 约束。
 
 	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
 	@Test
@@ -322,8 +322,8 @@ public class TestTGDuration {
 		for (int i = 0; i < list.size(); i++) {
 			sum += list.get(i).getPreciseTime();
 		}
-		assertEquals(TGDuration.WHOLE_PRECISE_DURATION * 3 / 64, sum);
-	}
+		assertEquals(TGDuration.WHOLE_PRECISE_DURATION * 3 / 64, sum); 
+	} //在更细的 partition 下，函数需要拆成更小的片段，而且必须使用 dotted 或 double-dotted 的 note divisions。
 
 	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
 	@Test
@@ -331,7 +331,7 @@ public class TestTGDuration {
 		List<TGDuration> list = TGDuration.splitPreciseDuration(TGDuration.WHOLE_PRECISE_DURATION / 19,
 				TGDuration.WHOLE_PRECISE_DURATION, factory);
 		assertNull(list);
-	}
+	} //在无法拆分的情况下，函数应该返回 null，表示无法满足约束。
 
 	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
 	@Test
@@ -346,7 +346,7 @@ public class TestTGDuration {
 			sum += preciseTime;
 		}
 		assertEquals(TGDuration.WHOLE_PRECISE_DURATION, sum);
-	}
+	} //在边界情况下，函数应该能够拆分，但所有片段必须严格小于等于 max。
 
 	// mswe261p 2026-01-23: partition-based cases for splitPreciseDuration
 	@Test
@@ -360,5 +360,5 @@ public class TestTGDuration {
 			// ignore, checked via ok flag
 		}
 		assertTrue(ok);
-	}
+	} //在非常大或非常小的输入下，函数应该能够正确处理，不会抛出异常或返回 null。
 }

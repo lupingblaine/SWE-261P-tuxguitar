@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
  * 说明：
  * 该测试类用于验证 MidiPlayerMode 的有限状态机行为，
  * 覆盖 Simple 与 Custom 两种模式下的状态不变式与状态转移。
+ * 节奏模式（Simple / Custom）随 loop 更新 tempo
  */
 public class TestMidiPlayerMode {
 

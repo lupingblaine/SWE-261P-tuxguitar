@@ -15,6 +15,7 @@ import app.tuxguitar.song.factory.TGFactory;
  * 说明：
  * 该测试类用于验证 TGVoice 的有限状态机行为，
  * 重点覆盖 empty 标志与 notes 列表之间的状态一致性与转移。
+ * empty 标志和 notes 列表组合导致的状态一致性问题（甚至能到“inconsistent state”）
  */
 public class TestTGVoiceStateMachine {
 

@@ -61,3 +61,8 @@ public class TestTrackManager {
 	}
 
 }
+// This test is an integration-style unit test for tie handling. 
+// It loads a real .tg song fixture and verifies that TGTrackManager 
+// correctly detects whether a note is tied and returns the correct 
+// next tied note across measures/voices.
+// It also checks negative cases where no tie exists and the method should return null.

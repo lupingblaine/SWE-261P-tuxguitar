@@ -467,7 +467,7 @@ public class TestMusicKeyUtils {
 	public void testNoteNameMidiRangeBoundaries() {
 		assertEquals("C0", TGMusicKeyUtils.sharpNoteFullName(TGMusicKeyUtils.MIN_MIDI_NOTE));
 		assertEquals("G9", TGMusicKeyUtils.sharpNoteFullName(TGMusicKeyUtils.MAX_MIDI_NOTE));
-	}
+	} //在 MIDI 范围边界上，函数应该返回正确的名称。
 
 	// mswe261p 2026-01-23: partition-based cases for invalid midi range
 	@Test
@@ -476,7 +476,7 @@ public class TestMusicKeyUtils {
 		assertNull(TGMusicKeyUtils.noteName(200, 0));
 		assertNull(TGMusicKeyUtils.sharpNoteFullName(0));
 		assertNull(TGMusicKeyUtils.sharpNoteFullName(200));
-	}
+	} //在 MIDI 范围之外，函数应该返回 null。
 
 	// mswe261p 2026-01-23: partition-based cases for invalid key signatures
 	@Test
@@ -485,5 +485,5 @@ public class TestMusicKeyUtils {
 		assertNull(TGMusicKeyUtils.noteName(69, 15));
 		assertNull(TGMusicKeyUtils.noteFullName(69, -1));
 		assertNull(TGMusicKeyUtils.noteFullName(69, 15));
-	}
+	} //在 key signature 范围之外，函数应该返回 null。
 }
