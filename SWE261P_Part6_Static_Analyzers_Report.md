@@ -3,6 +3,7 @@
 **Project:** TuxGuitar (Open Source Tablature Editor)\
 **Course:** SWE 261P\
 **Date:** March 03, 2026\
+**Member:** Xiyao Li & Ping Lu  
 **Base repository link:** [Click](https://github.com/helge17/tuxguitar)\
 **Forked repository link:**
 [Click](https://github.com/lupingblaine/SWE-261P-tuxguitar)
